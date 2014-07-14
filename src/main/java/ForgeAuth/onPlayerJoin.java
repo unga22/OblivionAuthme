@@ -19,7 +19,7 @@ public class onPlayerJoin extends PlayerEvent.PlayerLoggedInEvent {
 	
 	public onPlayerJoin(EntityPlayer player) {
 		super(player);
-		if (Vars.modEnabled) {
+		if (!Vars.modEnabled) {
 			Auth.print("No login, mod disabled");
 			Auth.players.put(player, Boolean.valueOf(true));
 		} else {

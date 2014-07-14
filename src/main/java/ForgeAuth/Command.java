@@ -30,7 +30,7 @@ public class Command extends CommandBase {
     @Override
 	public void processCommand(ICommandSender sender, String[] args) {
     	
-    	EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(sender.getCommandSenderName());
+    	EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(sender.getCommandSenderName());
 		if (args.length < 1) {
 			player.addChatComponentMessage(new ChatComponentText("$4[ForgeAuth] Use: /authreset <user>"));
 		} else {
