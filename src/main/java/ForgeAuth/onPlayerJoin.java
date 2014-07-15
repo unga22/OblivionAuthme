@@ -3,14 +3,20 @@ package ForgeAuth;
 
 
 
+import io.netty.buffer.ByteBuf;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.HashMap;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 
 
@@ -41,16 +47,10 @@ public class onPlayerJoin extends PlayerEvent.PlayerLoggedInEvent {
 					ex.printStackTrace();
 				}
 			}
-			
 			//no lo pude arreglar
+			FMLProxyPacket pkt = new FMLProxyPacket(null ,"AhutCgan1");
+			Auth.ForgeAuth.sendTo(pkt, (EntityPlayerMP) player);
 			
-		/*	Packet250CustomPayload packet = new Packet250CustomPayload();
-			packet.channel = "AuthChan1";
-			packet.data = bos.toByteArray();
-			packet.length = bos.size();
-			PacketBuffer.sendPacketToPlayer(packet, (Player) player);
-			
-			**/
 		}
 	}
 	

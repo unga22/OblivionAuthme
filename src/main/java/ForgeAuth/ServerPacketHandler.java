@@ -39,7 +39,7 @@ public class ServerPacketHandler
       {
          // DEBUG
          System.out.println("Server received packet from player = "+thePlayer.getEntityId());
-    // NO SE ARREGLAR ESTO     ProcessPacketServerSide.processPacketOnServer(event.packet.payload(), event.packet.getTarget(), thePlayer);
+         //ProcessPacketServerSide.processPacketOnServer(event.packet.payload(), event.packet.getTarget(), thePlayer);
       }
    }
 }

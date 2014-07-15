@@ -39,7 +39,6 @@ public class Auth
 
   
   //probando algo
-  public static final String networkChannelName = "ForgeAuth";
   public static FMLEventChannel ForgeAuth;
   
   
