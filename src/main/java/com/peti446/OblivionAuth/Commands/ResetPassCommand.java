@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import com.peti446.OblivionAuth.Herramientas;
 import com.peti446.OblivionAuth.OblivionAuth;
 
 import net.minecraft.client.Minecraft;
@@ -38,12 +39,26 @@ public class ResetPassCommand extends CommandBase{
 			if(args.length < 1){
 				player.addChatMessage(new ChatComponentText("§4[ForgeAuth] Use: /authreset <user>"));
 			} else {
-				File userFile = new File(OblivionAuth.userFolder, args[0]);
-				if(userFile.exists()){
-					userFile.delete();
-					player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + args[0] + "'s password reset."));
+				if(OblivionAuth.UsarMysql){
+					EntityPlayerMP diana = MinecraftServer.getServer().getConfigurationManager().func_152612_a(args[0]);
+					if(diana != null){
+						if(Herramientas.MysqlTienePass(diana)){
+							Herramientas.MysqlBorrarUsuario(diana);
+							player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + args[0] + "'s password reset."));
+						} else {
+							player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + "This player " + args[0] + " doesn't exists."));
+						}
+					} else {
+						player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + "This player " + args[0] + " doesn't exists."));
+					}
 				} else {
-					player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + "This player " + args[0] + " doesn't exists."));
+					File userFile = new File(OblivionAuth.userFolder, args[0]);
+					if(userFile.exists()){
+						userFile.delete();
+						player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + args[0] + "'s password reset."));
+					} else {
+						player.addChatMessage(new ChatComponentText("§4[ForgeAuth] " + "This player " + args[0] + " doesn't exists."));
+					}
 				}
 			}
 		}

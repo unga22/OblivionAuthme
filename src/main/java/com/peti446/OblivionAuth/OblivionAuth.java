@@ -1,17 +1,19 @@
 package com.peti446.OblivionAuth;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
 import com.peti446.OblivionAuth.Commands.ResetPassCommand;
 import com.peti446.OblivionAuth.Mysql.Mysql;
-import com.peti446.OblivionAuth.Packets.PacketPipeline;
+import com.peti446.OblivionAuth.Packets.ChannelHandler;
 import com.peti446.OblivionAuth.Proxy.ClientProxy;
 import com.peti446.OblivionAuth.Proxy.ServerProxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
+import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -51,14 +53,14 @@ public class OblivionAuth{
     //----------------------------------------------------------------------------------------------------------------------------------------------------
     //Variables
     
-    public static FMLEventChannel Channel;
+    public static ChannelHandler Channel;
     
     public static File userFolder;
-    public static boolean UsarMysql;
+    public static File recordarPassFile;
     public static Configuration config;
-    public static HashMap<String, String> mysqlDatos = new HashMap<String, String>();
-    public static final PacketPipeline packetPipeline = new PacketPipeline();
+    public static boolean UsarMysql;
     public static Mysql mysql;
+    public static HashMap<String, String> mysqlDatos = new HashMap<String, String>();
     public static HashMap<EntityPlayer, Boolean> jugadorLogeandose = new HashMap<EntityPlayer, Boolean>();  
     //Variables
     //----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,10 +69,11 @@ public class OblivionAuth{
     //PreInit
     @EventHandler
     public void PreInit(FMLPreInitializationEvent preEvent){
+    	Channel = new ChannelHandler(MODID, "OblivionAuth");
     	//Se Obtiene la direcion de la carpeta de los jugadores
-    	userFolder = new File(preEvent.getSuggestedConfigurationFile().getParentFile(), "OblivionAuthPlayers");
-    	//Combrobar si se esta ejecutando desde un servidor
     	if(preEvent.getSide() == Side.SERVER){
+    		//Combrobar si se esta ejecutando desde un servidor
+    		userFolder = new File(preEvent.getSuggestedConfigurationFile().getParentFile(), "OblivionAuthPlayers");
     		//Crear la carpeta userFolder si no existe
     		if(!userFolder.exists()){
         		userFolder.mkdir();
@@ -78,6 +81,9 @@ public class OblivionAuth{
     		//Se genera la config si no existe y se carga la config
     		config = new Configuration(preEvent.getSuggestedConfigurationFile());
     		config.load();
+    	}
+    	if(preEvent.getSide() == Side.CLIENT){
+    		recordarPassFile = new File(preEvent.getSuggestedConfigurationFile().getParentFile(), "OblivionAuthRemeber");
     	}
     }
     //PreInit
@@ -87,11 +93,10 @@ public class OblivionAuth{
     //Init
 	@EventHandler
 	public void Init(FMLInitializationEvent event){
-		Channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("OblivionAutt");
+		Channel.initialise();
 		//Registra el ServerProxy
 		serverProxy.registerRenderers();
 		//Registracion de PacketPipeline
-		packetPipeline.initialise("OblivionAuth");
 		//Combrobar si se esta ejecutando desde un servidor
 		if(event.getSide() == Side.SERVER){
 			//Obtener de la config los datos
@@ -108,6 +113,7 @@ public class OblivionAuth{
 				} catch (Exception e){
 					e.printStackTrace();
 				}
+				Herramientas.MysqlCrearTablaSiNoExiste();
 				if(userFolder.exists()){
 					userFolder.delete();
 				}
@@ -121,8 +127,8 @@ public class OblivionAuth{
     //PostInit
 	@EventHandler
 	public void PostInit(FMLPostInitializationEvent postEvent){
+		Channel.postInitialise();
 		//Registracion Secundaria de Pipeline
-		packetPipeline.postInitialise();
 		//Combrobar si se esta ejecutando desde un servidor
 		if(postEvent.getSide() == Side.SERVER){
 			//Si la config ha cambiado guardarla
@@ -140,8 +146,8 @@ public class OblivionAuth{
 	public void serverStart(FMLServerStartingEvent serverStartEvent){
 		//Combrobar si se esta ejecutando desde un servidor
 		if(serverStartEvent.getSide() == Side.SERVER){
-			//Registracion de Comandos
 			serverStartEvent.registerServerCommand(new ResetPassCommand());
+			//Registracion de Comandos
 		}
 	}
     //OnServerStart
